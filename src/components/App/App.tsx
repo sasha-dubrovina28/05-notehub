@@ -18,9 +18,9 @@ import type { Note } from '../../types/note';
 import css from './App.module.css';
 
 export default function App() {
-  const [page, setPage] = useState<number>(1);
-  const [search, setSearch] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -34,9 +34,8 @@ export default function App() {
     queryFn: () => fetchNotes({ page, search }),
   });
 
-  // ✅ FIX: safety layer (ЦЕ ВИРІШУЄ #130)
   const notes: Note[] = data?.notes ?? [];
-  const totalPages: number = data?.totalPages ?? 0;
+  const totalPages: number = data?.totalPages ?? 1;
 
   const createMutation = useMutation({
     mutationFn: createNote,
@@ -53,9 +52,8 @@ export default function App() {
     },
   });
 
-  // ✅ safe render guards
   if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error loading notes</p>;
+  if (isError) return <p>API error</p>;
 
   return (
     <div className={css.app}>
@@ -78,12 +76,12 @@ export default function App() {
         </button>
       </header>
 
-      {notes.length > 0 && (
-        <NoteList
-          notes={notes}
-          onDelete={(id: string) => deleteMutation.mutate(id)}
-        />
-      )}
+      <NoteList
+        notes={notes}
+        onDelete={(id: string) => deleteMutation.mutate(id)}
+      />
+
+      {notes.length === 0 && <p>No notes found</p>}
 
       {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
@@ -96,3 +94,4 @@ export default function App() {
     </div>
   );
 }
+
