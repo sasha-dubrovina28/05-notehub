@@ -34,6 +34,7 @@ export default function App() {
     queryFn: () => fetchNotes({ page, search }),
   });
 
+  // ✅ FIX: safety layer (ЦЕ ВИРІШУЄ #130)
   const notes: Note[] = data?.notes ?? [];
   const totalPages: number = data?.totalPages ?? 0;
 
@@ -52,6 +53,7 @@ export default function App() {
     },
   });
 
+  // ✅ safe render guards
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error loading notes</p>;
 
